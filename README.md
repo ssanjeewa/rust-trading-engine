@@ -61,3 +61,53 @@ If the order is an `Ask` order, it is not added to the orderbook. The code curre
 ```
 
 This will create a new `Orderbook` instance, create a `Bid` order with size 10.0, and add it to the `Orderbook` at a price of 100.0. The hashmap of bids in the `orderbook` will then be printed to the console.
+
+# Matching Engine
+
+The Matching Engine is a Rust library that provides a basic implementation of a matching engine for a cryptocurrency exchange. It includes functionality for creating and managing orderbooks for different trading pairs and placing limit orders in those orderbooks.
+
+## TradingPair
+
+The `TradingPair` struct represents a pair of base and quote currencies. It has two fields, `base` and `quote`, which are both of type `String`.
+
+The `TradingPair` struct has two methods defined on it:
+
+    `new(base: String, quote: String) -> TradingPair`: Creates a new `TradingPair` instance with the provided base and quote fields.
+
+    `to_string(self) -> String:` Returns a formatted string representation of the `TradingPair` instance in the format "base_quote".
+
+## Order
+
+The `Order` struct represents an order for a particular trading pair. It has two fields, `quantity` and `side`, which are both of type `f64`.
+
+## MatchingEngine
+
+The `MatchingEngine` struct manages `orderbooks` for different trading pairs. It has a single field, `orderbooks`, which is a `HashMap` that maps `TradingPair` instances to `Orderbook` instances.
+
+The `MatchingEngine` struct has two methods defined on it:
+
+    `new() -> MatchingEngine`: Creates a new `MatchingEngine` instance with an empty `orderbooks` `HashMap`.
+
+    `add_new_market(&mut self, pair: TradingPair):` Adds a new entry to the `orderbooks` `HashMap` with the `TradingPair` as the key and a new `Orderbook` instance as the value.
+
+    `place_limit_order(&mut self, pair: TradingPair, price: f64, order: Order) -> Result<(), String>:` Adds the provided Order instance to the `Orderbook` for the specified `TradingPair` at the specified price level.
+
+## Examples
+
+Creating a new `TradingPair` instance:
+
+```rust
+let pair = TradingPair::new(String::from("BTC"), String::from("USD"));
+
+```
+
+Adding a new `TradingPair` and `Order` instance to the `MatchingEngine`:
+
+```rust
+let mut engine = MatchingEngine::new();
+let pair = TradingPair::new(String::from("BTC"), String::from("USD"));
+let order = Order { quantity: 1.0, side: String::from("buy") };
+engine.add_new_market(pair.clone());
+engine.place_limit_order(pair.clone(), 10000.0, order.clone());
+
+```
