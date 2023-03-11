@@ -20,22 +20,30 @@ impl Orderbook {
         }
     }
     fn add_order(&mut self, price: f64, order: Order) {
-        match order.bid_or_ask {
-            BidOrAk::Bid => {
-                let price = Price::new(price);
+        let price = Price::new(price);
 
-                match self.bids.get_mut(&price) {
-                    Some(limit) => {
-                        limit.add_order(order);
-                    }
-                    None => {
-                        let mut limit = Limit::new(price);
-                        limit.add_order(order);
-                        self.bids.insert(price, limit);
-                    }
+        match order.bid_or_ask {
+            BidOrAk::Bid => match self.bids.get_mut(&price) {
+                Some(limit) => {
+                    limit.add_order(order);
                 }
-            }
-            BidOrAk::Ask => {}
+                None => {
+                    let mut limit = Limit::new(price);
+                    limit.add_order(order);
+                    self.bids.insert(price, limit);
+                }
+            },
+            BidOrAk::Ask => match self.asks.get_mut(&price) {
+                Some(limit) => {
+                    limit.add_order(order);
+                }
+
+                None => {
+                    let mut limit = Limit::new(price);
+                    limit.add_order(order);
+                    self.asks.insert(price, limit);
+                }
+            },
         }
     }
 }
@@ -95,9 +103,15 @@ fn main() {
     let buy_order = Order::new(BidOrAk::Bid, 5.5);
     let buy_order_bob = Order::new(BidOrAk::Bid, 3.5);
 
+    let sell_order = Order::new(BidOrAk::Ask, 5.5);
+    let sell_order_bob = Order::new(BidOrAk::Ask, 3.5);
+
     let mut orederbook = Orderbook::new();
     orederbook.add_order(5.5, buy_order_bob);
     orederbook.add_order(5.5, buy_order);
+
+    orederbook.add_order(6.0, sell_order);
+    orederbook.add_order(6.0, sell_order_bob);
 
     println!("{:?}", orederbook);
 }
