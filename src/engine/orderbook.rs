@@ -88,6 +88,24 @@ impl Limit {
         }
     }
 
+    fn fill_order(&mut self, market_order: &mut Order) {
+        for limit_order in self.orders.iter_mut() {
+            match market_order.size >= limit_order.size {
+                true => {
+                    market_order.size -= limit_order.size;
+                    limit_order.size = 0.0;
+                }
+                false => {
+                    limit_order.size -= market_order.size;
+                    market_order.size = 0.0;
+                }
+            }
+            if market_order.is_filled() {
+                break;
+            }
+        }
+    }
+
     fn add_order(&mut self, order: Order) {
         self.orders.push(order);
     }
@@ -96,5 +114,9 @@ impl Limit {
 impl Order {
     pub fn new(bid_or_ask: BidOrAk, size: f64) -> Order {
         Order { bid_or_ask, size }
+    }
+
+    pub fn is_filled(&self) -> bool {
+        self.size == 0.0
     }
 }
